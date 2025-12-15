@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>JSON 測試器</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    textarea { width: 100%; height: 150px; }
+    pre { background: #f4f4f4; padding: 10px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h2>前端 JSON 測試器</h2>
+  <textarea id="jsonInput" placeholder='在這裡輸入 JSON'></textarea><br>
+  <button onclick="sendJson()">送出到後端</button>
+
+  <h3>後端回傳：</h3>
+  <pre id="responseOutput"></pre>
+
+  <script>
+    async function sendJson() {
+      const input = document.getElementById("jsonInput").value;
+      let parsed;
+      try {
+        parsed = JSON.parse(input); // 確保是合法 JSON
+      } catch (e) {
+        document.getElementById("responseOutput").textContent = "❌ JSON 格式錯誤";
+        return;
+      }
+
+      const res = await fetch("/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed)
+      });
+
+      const data = await res.json();
+      document.getElementById("responseOutput").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
