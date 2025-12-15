@@ -1,29 +1,48 @@
-def send_push_notification(target, message):
-	"""
-	發送推播通知（範例：僅列印訊息）
-	"""
-	print(f"推播給 {target}：{message}")
+"""Notification helpers (demo implementations).
 
-def send_email(recipient, subject, body):
-	"""
-	發送 Email 通知（範例：僅列印訊息）
-	"""
-	print(f"Email 給 {recipient}，主旨：{subject}，內容：{body}")
+In a real system these should call external services (push, email, SMS)
+or enqueue background tasks. The functions here are simple and use
+logging so they can be tested locally without external dependencies.
+"""
 
-def send_sms(phone_number, message):
-	"""
-	發送簡訊通知（範例：僅列印訊息）
-	"""
-	print(f"簡訊給 {phone_number}：{message}")
+from typing import Any
+import logging
 
-def notify_payment_system(order_id, data):
-    """通知支付系統（範例：用推播或 API 呼叫）"""
-    message = f"訂單 {order_id} 已建立，金額計算中，內容：{data}"
-    send_push_notification("支付系統", message)
+logger = logging.getLogger(__name__)
 
-def notify_restaurant(order_id, data):
-    """通知餐廳（範例：用 Email 或簡訊）"""
-    subject = f"新訂單通知 #{order_id}"
-    body = f"餐廳收到新訂單：{data}"
-    send_email("restaurant@example.com", subject, body)
-    send_sms("0912345678", body)
+
+def send_push_notification(target: str, message: str) -> None:
+	"""Send a push notification (demo: log the message)."""
+	logger.info("PUSH -> %s: %s", target, message)
+
+
+def send_email(recipient: str, subject: str, body: str) -> None:
+	"""Send an email (demo: log the message)."""
+	logger.info("EMAIL -> %s | %s | %s", recipient, subject, body)
+
+
+def send_sms(phone_number: str, message: str) -> None:
+	"""Send an SMS (demo: log the message)."""
+	logger.info("SMS -> %s: %s", phone_number, message)
+
+
+def notify_payment_system(order_id: int, data: Any) -> None:
+	"""Notify payment system about a created order (demo).
+
+	This function is intentionally simple. In production it should
+	call the payment provider API asynchronously and handle retries.
+	"""
+	message = f"訂單 {order_id} 已建立，金額：{data.get('total_amount') if isinstance(data, dict) else 'unknown'}"
+	send_push_notification("payment-system", message)
+
+
+def notify_restaurant(order_id: int, data: Any) -> None:
+	"""Notify restaurant of a new order (demo).
+
+	Replace the body of this function with real integrations or
+	enqueue a background job for sending email/SMS/push.
+	"""
+	subject = f"新訂單通知 #{order_id}"
+	body = f"餐廳收到新訂單：{data}"
+	send_email("restaurant@example.com", subject, body)
+	send_sms("0912345678", body)
